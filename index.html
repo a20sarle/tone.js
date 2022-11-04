@@ -9,17 +9,36 @@
         integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        function playC4() {
-            const synth = new Tone.Synth().toDestination();
-            const now = Tone.now()
-            // trigger the attack immediately
-            synth.triggerAttack("C4", now)
-            // wait one second before triggering the release
-            synth.triggerRelease(now + 1)
+        // create a synth
+        const synth = new Tone.Synth().toMaster();
+        // create an array of notes to be played
+        const notes = ["C3", "Eb3", "G3", "Bb3"];
+        // create a new sequence with the synth and notes
+        const synthPart = new Tone.Sequence(
+        function(time, note) {
+            synth.triggerAttackRelease(note, "10hz", time);
+        },
+        notes,
+        "4n"
+        );
+
+        function play() {
+            // Setup the synth to be ready to play on beat 1
+            synthPart.start();
+            // Note that if you pass a time into the start method 
+            // you can specify when the synth part starts 
+            // e.g. .start('8n') will start after 1 eighth note
+            // start the transport which controls the main timeline
+            Tone.Transport.start();
+        }
+
+        function stop() {
+            synthPart.stop();
         }
     </script>
 </head>
 <body>
-    <button onclick="playC4()">Play</button>
+    <button onclick="play()">Play</button>
+    <button onclick="stop()">Stop</button>
 </body>
 </html>
