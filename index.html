@@ -5,8 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tone</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"
+        integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        function playC4() {
+            const synth = new Tone.Synth().toDestination();
+            const now = Tone.now()
+            // trigger the attack immediately
+            synth.triggerAttack("C4", now)
+            // wait one second before triggering the release
+            synth.triggerRelease(now + 1)
+        }
+    </script>
 </head>
 <body>
-    
+    <button onclick="playC4()">Play</button>
 </body>
 </html>
