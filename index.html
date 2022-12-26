@@ -6,29 +6,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tone</title>
     <script src="https://unpkg.com/tone@14.8.36/build/Tone.js"></script>
+    <style>
+
+        /* visually pressing down piano key when user manually 
+        clicks the svg through removal of the drop-
+        shadow when key is pressed down */
+
+        [class^="cls"] {
+            filter: drop-shadow(1.2px 3px 1.2px rgb(0 0 0 / 0.2));
+        }
+        [class^="cls"]:active {
+            filter: none;
+        }
+
+        /* Set size of the whole svg through #svgsize
+        beeing an id of a div holding the whole svg elements 
+        making a part of a full piano */
+
+        #svgsize {
+            width: 100vh;
+        }
+    </style>
     <script>
-        // music from https://soundcloud.com/jonathanogdenmusic/this-love
-        const player = new Tone.Player("jonathan_ogden-this_love.mp3").toDestination();
 
-        function play() {
-            player.start();
+        // The black and white keys are separated to make the
+        // code easier read and to avoid having to check if
+        // variable 'note' is upper case or lower case later on
+        // in the else-if-statements.
+
+        const keysWhite = ['c','d','e','f','g','a','b'];
+        const keysBlack = ['C','D','F','G','A'];
+
+        // Pass object to map the note's pitch to the url.
+        // Used member 'release' which sets/triggers the lenght
+        // of the note. Tone.Sampler was used to allow repitching.
+
+        
+        var instrument = new Tone.Sampler({
+            urls: {
+                "C4": "C4.mp3",
+                "D#4": "Ds4.mp3",
+                "F#4": "Fs4.mp3",
+                "A4": "A4.mp3",
+            },
+            // release: 1,
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+        }).toDestination();
+    
+
+        // Fill out the full name of the key pressed
+        // if needed and return the activeKey.
+
+        function setActiveKey(){
+            if(keysBlack.includes(note)){
+                note += '#';
+            } 
+            else if(keysWhite.includes(note)) {
+                note;
+            } else {
+                console.log("'"+note+"'"+" is not defined as a tone in the array");
+                return;
+            }
+
+            return activeKey = note;
         }
 
-        function stop() {
-            player.stop();
+        // Visually press down the piano key by removing
+        // the shadow.
+
+        function visuallyPressKey(pKey){
+            svgEl = document.getElementById(pKey);
+            if(svgEl != null){
+                svgEl.style.setProperty('filter', 'initial');
+            } else {
+                return;
+            }
         }
+
+        // Visually release the piano key by bringing back the
+        // elements' shadow.
+
+        function visuallyReleaseKey(rKey){
+            svgEl = document.getElementById(rKey);
+            if(svgEl != null){
+                svgEl.style.setProperty('filter', 'drop-shadow(1.2px 3px 1.2px rgb(0 0 0 / 0.2))');
+            } else {
+                return;
+            }
+        }
+
+        // Play the tone now, without delay, through
+        // the use of tone.js's library.
+
+        function playtone(tone) {
+            // Obs! If 'const now = Tone.now();' is
+            // removed, piano stopps sounding after 
+            // approx. 30 sec.
+            const now = Tone.now();
+            instrument.triggerAttack(tone+"4", now);
+        }
+
+        // Play note based on **keyboard** event
+        document.addEventListener("keydown", e => {
+            note = e.key;
+            note = setActiveKey();
+            visuallyPressKey(note);
+            playtone(note);
+            
+        });
+
+        // Release note based on **keyboard** event
+        document.addEventListener("keyup", e => {
+            note = e.key;
+            note = setActiveKey();
+            visuallyReleaseKey(note);            
+        });
+
+        // Play note based on **mouse** event
+        document.addEventListener("mousedown", e => {
+            note = e.target.id;
+            visuallyPressKey(note);
+            playtone(note);
+        });
+
+        // Play note based on **mouse** event
+        document.addEventListener("mouseup", e => {
+            note = e.target.id;
+            visuallyReleaseKey(note);
+        });
     </script>
 </head>
 <body>
-    <!-- 
-        Obs! As the ES6 modules goes by the same-origin policy
-        the file needs to be opened via a server to be able to 
-        fetch the music file. 
-        See more: https://github.com/a20sarle/tone.js/issues/1
-     -->
-
-    <p>Play song using Tone.js</p>
-    <button onclick="play()">Play</button>
-    <button onclick="stop()">Stop</button>
+    <tone-piano></tone-piano>
+    <div id="svgsize">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 340">
+            <defs>
+                <style>
+                    .cls-1 {
+                        fill: #e6e6e6;
+                    }
+        
+                    .cls-2 {
+                        fill: #1a1a1a;
+                    }
+                </style>
+            </defs>
+            <g id="Layer_2" data-name="Layer 2">
+                <g id="Piano_v2" data-name="Piano v2">
+                    <g id="whites_shape" data-name="whites shape">
+                        <path class="cls-1" id="c"
+                            d="M62.05,194c-5.55,0-10-3.91-10-8.73V0H0V312.65A14.36,14.36,0,0,0,14.35,327h51.3A14.36,14.36,0,0,0,80,312.65V194Z" />
+                        <path class="cls-1" id="f"
+                            d="M320.05,194c-5.55,0-10.05-3.91-10.05-8.73V0H255V312.65A14.36,14.36,0,0,0,269.35,327h51.3A14.36,14.36,0,0,0,335,312.65V194Z" />
+                        <path class="cls-1" id="d"
+                            d="M150.05,194c-5.55,0-10.05-3.91-10.05-8.73V0H108V185.27c0,4.82-4.5,8.73-10,8.73H85V312.65A14.36,14.36,0,0,0,99.35,327h51.3A14.36,14.36,0,0,0,165,312.65V194Z" />
+                        <path class="cls-1" id="e"
+                            d="M196,0V185.27c0,4.82-4.5,8.73-10.05,8.73H170V312.65A14.36,14.36,0,0,0,184.35,327h51.3A14.36,14.36,0,0,0,250,312.65V0Z" />
+                        <path class="cls-1" id="g"
+                            d="M405.05,194c-5.55,0-10.05-3.91-10.05-8.73V0H366V185.27c0,4.82-4.5,8.73-10.05,8.73H340V312.65A14.36,14.36,0,0,0,354.35,327h51.3A14.36,14.36,0,0,0,420,312.65V194Z" />
+                        <path class="cls-1" id="a"
+                            d="M490.05,194c-5.55,0-10.05-3.91-10.05-8.73V0H451V185.27c0,4.82-4.5,8.73-10.05,8.73H425V312.65A14.36,14.36,0,0,0,439.35,327h51.3A14.36,14.36,0,0,0,505,312.65V194Z" />
+                        <path class="cls-1" id="b"
+                            d="M536,0V185.27c0,4.82-4.5,8.73-10,8.73H510V312.65A14.36,14.36,0,0,0,524.35,327h51.3A14.36,14.36,0,0,0,590,312.65V0Z" />
+                    </g>
+                    <g id="blacks">
+                        <path class="cls-2" id="C#" d="M52,185.49c0,4.7,4.5,8.51,10,8.51H98c5.55,0,10-3.81,10-8.51V0H52Z" />
+                        <path class="cls-2" id="D#" d="M140,185.49c0,4.7,4.5,8.51,10.05,8.51H186c5.55,0,10.05-3.81,10.05-8.51V0H140Z" />
+                        <path class="cls-2" id="F#" d="M310,185.49c0,4.7,4.5,8.51,10.05,8.51H356c5.55,0,10.05-3.81,10.05-8.51V0H310Z" />
+                        <path class="cls-2" id="G#" d="M395,185.49c0,4.7,4.5,8.51,10.05,8.51H441c5.55,0,10.05-3.81,10.05-8.51V0H395Z" />
+                        <path class="cls-2" id="A#" d="M480,185.49c0,4.7,4.5,8.51,10.05,8.51H526c5.55,0,10-3.81,10-8.51V0H480Z" />
+                    </g>
+                </g>
+            </g>
+        </svg>
+        <p>
+            The keyboard follows the naming of the notes, e.g. click "c" to play tone C4.
+            Use "shift" to play the black keys.
+        </p>
+    </div>
 </body>
 </html>
